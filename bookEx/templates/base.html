@@ -3,54 +3,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>
-        {% block title %}
-            My Title
-        {% endblock title %}
-    </title>
-    <link href="{% static 'main.css' %}" rel="stylesheet" type="text/css">
+	<meta charset="UTF-8">
+	<title>
+		{% block title %}
+			Book Exchange
+		{% endblock title %}
+	</title>
+	<link rel="icon" type="image/x-icon" href="{% static 'logo.jpg' %}">
+	<link href="{% static 'main.css' %}" rel="stylesheet" type="text/css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+	      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+	        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+	        crossorigin="anonymous"></script>
 </head>
 
 <body>
-<div id="wrapper">
-    <header id="header">
-        <img src="{% static 'logo.jpg' %}" height="50"/>
+<div id="navbar">
 
-        <span style="float: right;" >
-            {% if user.is_authenticated %}
-               {{ user.username }}
-               <form action="{% url 'logout' %}?next=/" method="post">
-                   <button type="submit">logout</button>
-                   {% csrf_token %}
-               </form>
-            {% else %}
-               Not Logged in.
-               <a href="{% url 'login' %}?next=/">Login</a>
-            {% endif %}
-        </span>
+	{% if user.is_authenticated %}
+		{{ user.username }}
+		<form action="{% url 'logout' %}?next=/" method="post">
+			<button type="submit">logout</button>
+			{% csrf_token %}
+		</form>
+	{% else %}
+		<nav id="navbar" class="navbar navbar-expand-lg bg-body-tertiary ">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="{% url 'index' %}">
+					<img src="{% static 'logo.jpg' %}" alt="Book Exchange" height="50" width="50"
+					     class="d-line-block ">
+					Book Exchange
+				</a>
+				<form class="d-flex" role="search">
+					<input class="form-control me-2" type="search" placeholder="Library Awaits..." aria-label="Search">
+					<button class="btn btn-outline-success" type="submit">Search</button>
+				</form>
 
-        <img src="{% static 'banner.jpg' %}" width="800" height="150"/>
-    </header>
+				<ul class="navbar-nav">
+					<li class=" nav-item dropdown">
 
-    <aside id="leftsidebar">
-        <nav id="nav">
-            <ul>
-                 {% block sidenav %}
-                     <li> Menu 1</li>
-                     <li> Menu 2</li>
-                 {% endblock sidenav %}
-            </ul>
-        </nav>
-    </aside>
-    <section id="main">
-        {% block content %}
-           <h1>This is our Book Exchange System</h1>
-        {% endblock content %}
-    </section>
-    <footer id="footer">
-        2024 Spring CS3337 Section 1 Project
-    </footer>
+						<button class="btn btn-secondary dropdown-toggle" type="button"
+						        data-bs-toggle="dropdown">Sign in for <br> books & lists
+						</button>
+						<ul class="dropdown-menu">
+							<li class="dropdown-item"><a href="{% url 'login' %}?next=/">Login</a></li>
+						</ul>
+
+
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" aria-current="page" href="{% url 'about_us' %}">About Us</a>
+
+					</li>
+				</ul>
+
+
+			</div>
+		</nav>
+
+	{% endif %}
+
+
+
+	<div class="d-flex justify-content-center flex-column align-items-center">
+		<img src="{% static 'banner2.0.png' %}" alt="BANNER"
+		     width="1480" height="300"/>
+		<section id="main">
+			{% block content %}
+				<h1 class="text-center ">This is our Book Exchange System</h1>
+			{% endblock content %}
+		</section>
+	</div>
+
+
+	<footer id="footer">
+		2024 Spring CS3337 Section 1 Project
+	</footer>
 </div>
 </body>
 </html>
