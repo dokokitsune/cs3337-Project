@@ -28,7 +28,11 @@
              </a>
          </td>
          <td>
-             <img src="{% static book.pic_path %}" height="50"/>
+             <div vertical-align=""><img src="{% static book.pic_path %}" height="50"/></div>
+            <div align="center">
+            <a href="{% url 'add_comment' book_id=book.id %}">Add Comment</a> /
+            <a href="{% url 'displaycom' book_id=book.id %}">View Comments</a>
+            </div>
          </td>
      </tr>
     {% endfor %}
