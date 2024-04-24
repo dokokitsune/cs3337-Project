@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block sidenav %}
+    {% for item in item_list %}
+     <li>
+         <a href="{{ item.link }}"> {{ item.item }} </a>
+     </li>
+    {% endfor %}
+{% endblock sidenav %}
+
+{% block title %}
+    Shopping Cart
+{% endblock title %}
+
+
+
+{% block content %}
+    <h1>Shopping Cart</h1>
+    <table class="cart">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+                <tr>
+                    <td>{{ item.book.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ item.book.price }}</td>
+                    <td>
+                        <a href="{% url 'remove_from_cart' item.book.id %}">Remove</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p>Total Price: ${{ total_price }}</p>
+{% endbock content %}
+
