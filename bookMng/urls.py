@@ -9,5 +9,7 @@ urlpatterns = [
     path('postbook', views.postbook, name='postbook'),
     path('displaybooks', views.displaybooks, name='displaybooks'),
     path('mybooks', views.mybooks, name='mybooks'),
+    path('add_comment/<int:book_id>/', views.add_comment, name='add_comment'),
+    path('displaycom/<int:book_id>/', views.displaycom, name='displaycom'),
 ]
 
