@@ -1,10 +1,10 @@
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
-from .models import MainMenu
-from .forms import BookForm
+from .models import MainMenu, Comment
+from .forms import BookForm, CommentForm
 from .models import Book
 
 from django.views.generic.edit import CreateView
@@ -98,8 +98,36 @@ def mybooks(request):
 def book_delete(request, book_id):
     book = Book.objects.get(id=book_id)
     book.delete()
+
     return render(
         request,
         "bookMng/book_delete.html",
         {"item_list": MainMenu.objects.all(), "book": book},
     )
+
+
+@login_required(login_url=reverse_lazy('login'))
+def add_comment(request, book_id):
+    book = Book.objects.get(id=book_id)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            form.instance.book = book
+            form.save()
+            return redirect('displaycom', book_id=book_id)
+    else:
+        form = CommentForm()
+    return render(request,
+                  'bookMng/add_comment.html',
+                  {
+                      'item_list': MainMenu.objects.all(), 'form': form, 'book': book})
+
+@login_required(login_url=reverse_lazy('login'))
+def displaycom(request, book_id):
+    book = Book.objects.get(id=book_id)
+    comments = Comment.objects.filter(book=book)
+    return render(request,
+                  'bookMng/displaycom.html',
+                  {
+                      'item_list': MainMenu.objects.all(), 'book': book, 'comments': comments})
+

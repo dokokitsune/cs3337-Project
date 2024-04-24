@@ -24,7 +24,13 @@ class Book(models.Model):
     def __str__(self):
         return str(self.id)
 
+class Comment(models.Model):
+    username = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    text = models.TextField()
 
+    def __str__(self):
+        return str(self.id)
 
 
 

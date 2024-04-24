@@ -1,0 +1,64 @@
+{%  load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+            My Title
+        {% endblock title %}
+    </title>
+    <link href="{% static 'main.css' %}" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+<div id="wrapper">
+    <header id="header">
+
+        <span style="float: right;">
+            {% if user.is_authenticated %}
+                {{ user.username }}
+                <form action="{% url 'logout' %}?next=/" method="post">
+                    <button type="submit">logout</button>
+                    {% csrf_token %}
+                </form>
+            {% else%}
+                Not Logged in.
+                <a href="{% url 'login' %}?next=/">Login</a>
+            {% endif %}
+            <br>
+
+            <form action="{% url 'search_book' %}" method="post">
+                <input type="text" name="search-item" placeholder="Search Book name">
+                <br>
+                <button>Submit</button>
+                {% csrf_token %}
+            </form>
+        </span>
+
+        <img src="{% static 'banner.jpg' %}" alt="" width="600" height="150" />
+
+    </header>
+    <aside id="leftsidebar">
+        <nav id="nav">
+            <ul>
+                {% block sidenav %}
+                    <li>Menu 1</li>
+                    <li>Menu 2</li>
+                {% endblock sidenav %}
+            </ul>
+        </nav>
+    </aside>
+    <section id="main">
+        {% block content %}
+            <h1>This is out Book Exchange System</h1>
+        {% endblock content %}
+    </section>
+    <footer id="footer">
+        2024 Spring  Cs3337 Section 1 Project
+    </footer>
+</div>
+</body>
+</html>
