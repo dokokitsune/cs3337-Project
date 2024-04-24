@@ -134,3 +134,53 @@ def displaycom(request, book_id):
                   'bookMng/displaycom.html',
                   {
                       'item_list': MainMenu.objects.all(), 'book': book, 'comments': comments})
+
+def add_to_cart(request, book_id):
+    book = Book.objects.get(id=book_id)
+
+    if 'cart' not in request.session:
+        request.session['cart'] = {}
+
+    cart = request.session['cart']
+
+    if str(book_id) in cart:
+        cart[str(book_id)]['quantity'] += 1
+    else:
+        cart[str(book_id)] = {
+            'quantity': 1,
+            'price': float(book.price)
+        }
+
+    request.session.modified = True
+
+    return redirect('cart')
+
+
+
+def remove_from_cart(request, book_id):
+    if 'cart' in request.session:
+        cart = request.session['cart']
+        if str(book_id) in cart:
+            del cart[str(book_id)]
+            request.session.modified = True
+
+    return redirect('cart')
+
+
+def cart(request):
+    cart_items = []
+    total_price = 0
+
+    if 'cart' in request.session:
+        cart = request.session['cart']
+        book_ids = cart.keys()
+        books = Book.objects.filter(id__in=book_ids)
+
+        for book in books:
+            quantity = cart[str(book.id)]['quantity']
+            total_price += book.price * quantity
+            cart_items.append({'book': book, 'quantity': quantity})
+
+    return render(request, 'bookMng/cart.html',
+                  {'cart_items': cart_items, 'total_price': total_price,
+                   'item_list': MainMenu.objects.all()})
