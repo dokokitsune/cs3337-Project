@@ -35,9 +35,10 @@
 					     class="d-line-block ">
 					Book Exchange
 				</a>
-				<form class="d-flex" role="search">
-					<input class="form-control me-2" type="search" placeholder="Library Awaits..." aria-label="Search">
+				<form action="{% url 'search_book' %}" method="post" class="d-flex" role="search">
+					<input name="search-item" class="form-control me-2" type="search" placeholder="Library Awaits..." aria-label="Search">
 					<button class="btn btn-outline-success" type="submit">Search</button>
+                    {% csrf_token %}
 				</form>
 
 				<ul class="navbar-nav">
