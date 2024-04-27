@@ -181,3 +181,23 @@ def cart(request):
                   {'cart_items': cart_items, 'total_price': total_price,
                    'item_list': MainMenu.objects.all()})
 
+
+
+def search_book(request):
+    if request.method == 'POST':
+        searched_book = request.POST.get('search-item')
+
+        if searched_book:
+            books = Book.objects.filter(name__icontains=searched_book)
+
+            for b in books:
+                b.pic_path = b.picture.url[14:]
+        else:
+            books = Book.objects.none()
+
+        return render(request,
+                      'bookMng/display_search_results.html',
+                      {
+                          'item_list': MainMenu.objects.all(),
+                          'books': books
+                      })

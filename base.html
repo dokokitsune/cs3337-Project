@@ -30,12 +30,7 @@
             {% endif %}
             <br>
 
-            <form action="{% url 'search_book' %}" method="post">
-                <input type="text" name="search-item" placeholder="Search Book name">
-                <br>
-                <button>Submit</button>
-                {% csrf_token %}
-            </form>
+
         </span>
 
         <img src="{% static 'banner.jpg' %}" alt="" width="600" height="150" />
