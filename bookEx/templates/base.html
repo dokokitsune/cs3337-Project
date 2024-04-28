@@ -22,11 +22,48 @@
 <div id="navbar">
 
 	{% if user.is_authenticated %}
+		<nav id="navbar" class="navbar navbar-expand-lg bg-body-tertiary ">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="{% url 'index' %}">
+					<img src="{% static 'logo.jpg' %}" alt="Book Exchange" height="50" width="50"
+					     class="d-line-block ">
+					Book Exchange
+				</a>
+				<form class="d-flex" role="search">
+					<input class="form-control me-2" type="search" placeholder="Library Awaits..." aria-label="Search">
+					<button class="btn btn-outline-success" type="submit">Search</button>
+				</form>
+
+				<ul class="navbar-nav">
+					<li class=" nav-item dropdown">
+
+						<button class="btn btn-secondary dropdown-toggle" type="button"
+						        data-bs-toggle="dropdown">Account
+						</button>
+						<ul class="dropdown-menu">
+							<li class="dropdown-item"><a href="{% url 'mybooks' %}?next=/">My Books</a></li>
+							<li class="dropdown-item"><a href="{% url 'postbook' %}?next=/">Post Book</a></li>
+							<li class="dropdown-item"><a href="{% url 'cart' %}?next=/">Shopping Cart</a></li>
+						</ul>
+
+
+					</li>
+					<li class = "nav-item" >
+						<form action="{% url 'logout' %}?next=/" method="post">
+							<button class="btn btn-outline-danger" href="{% url 'logout' %}?next=/" type="submit">logout</button>
+							{% csrf_token %}
+						</form>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" aria-current="page" href="{% url 'about_us' %}">About Us</a>
+
+					</li>
+				</ul>
+
+
+			</div>
+		</nav>
 		{{ user.username }}
-		<form action="{% url 'logout' %}?next=/" method="post">
-			<button type="submit">logout</button>
-			{% csrf_token %}
-		</form>
 	{% else %}
 		<nav id="navbar" class="navbar navbar-expand-lg bg-body-tertiary ">
 			<div class="container-fluid">
@@ -45,7 +82,7 @@
 					<li class=" nav-item dropdown">
 
 						<button class="btn btn-secondary dropdown-toggle" type="button"
-						        data-bs-toggle="dropdown">Sign in for <br> books & lists
+						        data-bs-toggle="dropdown">Account
 						</button>
 						<ul class="dropdown-menu">
 							<li class="dropdown-item"><a href="{% url 'login' %}?next=/">Login</a></li>
