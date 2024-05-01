@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -20,6 +21,7 @@ class Book(models.Model):
     picture = models.FileField(upload_to='bookEx/static/uploads')
     pic_path = models.CharField(max_length=300, editable=False, blank=True)
     username = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
+    favorites = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='favorite_books')
 
     def __str__(self):
         return str(self.id)

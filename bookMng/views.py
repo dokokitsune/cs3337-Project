@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
 from .models import MainMenu, Comment
@@ -13,6 +13,26 @@ from django.urls import reverse_lazy
 
 from django.contrib.auth.decorators import login_required
 
+
+@login_required
+def favorite(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    user = request.user
+
+    if user in book.favorites.all():
+        # Book is already a favorite, remove it
+        book.favorites.remove(user)
+    else:
+        # Add the book to favorites
+        book.favorites.add(user)
+
+    return redirect('book_detail', book_id=book.id)
+
+@login_required
+def my_favorites(request):
+    user = request.user
+    favorite_books = user.favorite_books.all()
+    return render(request, 'bookMng/my_favorites.html', {'favorite_books': favorite_books, 'item_list': MainMenu.objects.all()})
 
 def index(request):
     return render(request, "bookMng/index.html", {"item_list": MainMenu.objects.all()})
