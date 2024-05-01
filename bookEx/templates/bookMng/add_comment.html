@@ -11,10 +11,12 @@
 {% endblock sidenav %}
 
 {% block content %}
-     <h1>Add Comment for {{ book.name }}</h1>
-    <form method="post">
+     <h1 align="center" style="margin-bottom:50px">Add Comment for {{ book.name }}</h1>
+    <div align="center">
+    <form method="post" align="center" style="width: 30%; padding: 15px; background-color:#F5F5F5; border-radius: 10px">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Submit</button>
     </form>
+        <button type="submit" class="btn btn-success" style="margin-top:20px">Submit</button>
+    </div>
 {% endblock content %}

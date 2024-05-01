@@ -10,28 +10,36 @@
 {% endblock sidenav %}
 
 {% block content %}
-<h1 align="center">Display Page</h1>
-<table border="2" width="600">
+<h1 style="margin-bottom:50px; font-family: Georgia;" align="center" >Display Books Page</h1>
+<table align="center" border="15" width="600">
     <tr>
         <th>
-            Name
+            <h3 style="margin-bottom:20px; margin-top:20px; font-family: Georgia;" align="center">Name</h3>
         </th>
         <th>
-            Picture
+            <h3 style="margin-bottom:20px; margin-top:20px; font-family: Georgia;" align="center" >Picture</h3>
         </th>
     </tr>
     {% for book in books %}
      <tr>
-         <td>
-             <a href="book_detail/{{ book.id }}">
+         <td align="center">
+             <a href="book_detail/{{ book.id }}" style="text-decoration:none">
                 {{ book.name }}
              </a>
          </td>
          <td>
-             <div vertical-align=""><img src="{% static book.pic_path %}" height="50"/></div>
-            <div align="center">
-            <a href="{% url 'add_comment' book_id=book.id %}">Add Comment</a> /
-            <a href="{% url 'displaycom' book_id=book.id %}">View Comments</a>
+             <div align="center" style="margin-top:15px"  vertical-align="">
+                 <img src="{% static book.pic_path %}" height="50"/>
+             </div>
+            <div align="center" style="margin-top:10px">
+
+            <a href="{% url 'add_comment' book_id=book.id %}" style="text-decoration:none; margin-bottom:20px"
+               type="button" class="btn btn-outline-warning" >
+                Add Comment
+            </a>
+            <a href="{% url 'displaycom' book_id=book.id %}" style="text-decoration:none; margin-bottom:20px"
+             type="button" class="btn btn-outline-info">
+                View Comments</a>
             </div>
          </td>
      </tr>
