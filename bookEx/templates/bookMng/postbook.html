@@ -10,18 +10,20 @@
 {% endblock sidenav %}
 
 {% block content %}
-<h1 align="center">This is Post Book Page</h1>
+<h1  style="margin-bottom:50px; font-family: Georgia;" align="center">This is Post Book Page</h1>
 {% if submitted %}
-   <p>
+   <h5 align="center" style="color:green">
        Post Book Successfully!
-   </p>
+   </h5>
 {% else %}
+
 <form action="" enctype="multipart/form-data" method="post" novalidate>
-    <table>
+    <table align="center" cellpadding="10px" style="background-color: #F0EAE8; width: 40%;
+    border-radius: 10px">
         {{ form.as_table }}
         <tr>
             <td>
-                <input type="submit" value="Submit">
+                <input type="submit" value="Submit" class="btn btn-primary btn-sm">
             </td>
         </tr>
     </table>

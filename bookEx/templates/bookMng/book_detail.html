@@ -10,15 +10,15 @@
 {% endblock sidenav %}
 
 {% block content %}
-<h1 align="center">Book Detail</h1>
+<h1 align="center" style="font-family: Georgia">Book Detail</h1>
 
-<table width="600">
+<table width="600"  align="center" style="margin-top:30px">
    <td align="center">
       <img src="{% static book.pic_path %}" height="300" />
    </td>
 </table>
 
-<table border="2" width="600">
+<table border="2" width="600" align="center" style="margin-top:30px" cellpadding="10px">
     <tr>
         <th>
             Name
@@ -48,8 +48,10 @@
          </td>
      </tr>
 </table>
+<div align="center" style="margin-top:30px">
 <form action="{% url 'add_to_cart' book.id %}" method="post">
     {% csrf_token %}
-    <button type="submit">Add to Cart</button>
+    <button type="submit" class="btn btn-primary btn-sm">Add to Cart</button>
 </form>
 {% endblock content %}
+</div>
