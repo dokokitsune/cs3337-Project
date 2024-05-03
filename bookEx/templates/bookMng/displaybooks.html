@@ -19,6 +19,9 @@
         <th>
             <h3 style="margin-bottom:20px; margin-top:20px; font-family: Georgia;" align="center" >Picture</h3>
         </th>
+        <th>
+            <h3 style="margin-bottom:20px; margin-top:20px; font-family: Georgia;" align="center" >Genre(s)</h3>
+        </th>
     </tr>
     {% for book in books %}
      <tr>
@@ -41,6 +44,12 @@
              type="button" class="btn btn-outline-info">
                 View Comments</a>
             </div>
+         </td>
+         <td>
+             {% for genre in book.genres.all %}
+             <a style="text-decoration:none">{{ genre.name }}</a>
+             {% if not forloop.last %}, {% endif %}
+             {% endfor %}
          </td>
      </tr>
     {% endfor %}

@@ -24,6 +24,9 @@
             Name
         </th>
         <th>
+            Genre(s)
+        </th>
+        <th>
             Price
         </th>
         <th>
@@ -36,6 +39,12 @@
     <tr>
          <td>
                 {{ book.name }}
+         </td>
+        <td>
+             {% for genre in book.genres.all %}
+             <a style="text-decoration:none">{{ genre.name }}</a>
+             {% if not forloop.last %}, {% endif %}
+             {% endfor %}
          </td>
          <td>
                 {{ book.price }}

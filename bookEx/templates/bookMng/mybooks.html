@@ -17,6 +17,9 @@
             Name
         </th>
         <th>
+            Genre(s)
+        </th>
+        <th>
             Picture
         </th>
         <th>
@@ -29,6 +32,12 @@
              <a href="book_detail/{{ book.id }}">
                 {{ book.name }}
              </a>
+         </td>
+         <td>
+             {% for genre in book.genres.all %}
+             <a style="text-decoration:none">{{ genre.name }}</a>
+             {% if not forloop.last %}, {% endif %}
+             {% endfor %}
          </td>
          <td>
              <img src="{% static book.pic_path %}" height="50"/>
