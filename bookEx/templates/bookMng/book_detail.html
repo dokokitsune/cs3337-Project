@@ -10,18 +10,21 @@
 {% endblock sidenav %}
 
 {% block content %}
-<h1 align="center" style="font-family: Georgia">Book Detail</h1>
+<h1 align="center">Book Detail</h1>
 
-<table width="600"  align="center" style="margin-top:30px">
+<table width="600">
    <td align="center">
       <img src="{% static book.pic_path %}" height="300" />
    </td>
 </table>
 
-<table border="2" width="600" align="center" style="margin-top:30px" cellpadding="10px">
+<table border="2" width="600">
     <tr>
         <th>
             Name
+        </th>
+        <th>
+            Genre(s)
         </th>
         <th>
             Price
@@ -37,6 +40,12 @@
          <td>
                 {{ book.name }}
          </td>
+        <td>
+             {% for genre in book.genres.all %}
+             <a style="text-decoration:none">{{ genre.name }}</a>
+             {% if not forloop.last %}, {% endif %}
+             {% endfor %}
+         </td>
          <td>
                 {{ book.price }}
          </td>
@@ -48,10 +57,12 @@
          </td>
      </tr>
 </table>
-<div align="center" style="margin-top:30px">
 <form action="{% url 'add_to_cart' book.id %}" method="post">
     {% csrf_token %}
-    <button type="submit" class="btn btn-primary btn-sm">Add to Cart</button>
+    <button type="submit">Add to Cart</button>
+</form>
+<form method="post" action="{% url 'favorite' book.id %}">
+    {% csrf_token %}
+    <button type="submit" name="add_to_favorites">Add to Favorites</button>
 </form>
 {% endblock content %}
-</div>

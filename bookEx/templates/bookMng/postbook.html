@@ -10,24 +10,22 @@
 {% endblock sidenav %}
 
 {% block content %}
-<h1  style="margin-bottom:50px; font-family: Georgia;" align="center">This is Post Book Page</h1>
+<h1 align="center">This is Post Book Page</h1>
 {% if submitted %}
-   <h5 align="center" style="color:green">
+   <p>
        Post Book Successfully!
-   </h5>
+   </p>
 {% else %}
-
 <form action="" enctype="multipart/form-data" method="post" novalidate>
-    <table align="center" cellpadding="10px" style="background-color: #F0EAE8; width: 40%;
-    border-radius: 10px">
+    {% csrf_token %}
+    <table>
         {{ form.as_table }}
         <tr>
             <td>
-                <input type="submit" value="Submit" class="btn btn-primary btn-sm">
+                <input type="submit" class="btn btn-primary" value="Submit">
             </td>
         </tr>
     </table>
-    {% csrf_token %}
 </form>
 {% endif %}
 {% endblock content %}

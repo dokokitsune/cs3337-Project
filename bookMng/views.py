@@ -131,12 +131,6 @@ def displaycom(request, book_id):
                   {
                       'item_list': MainMenu.objects.all(), 'book': book, 'comments': comments})
 
-@login_required(login_url=reverse_lazy("login"))
-def delete_comment(request, book_id, comment_id):
-    comment = Comment.objects.get(id=comment_id, book_id=book_id)
-    comment.delete()
-    return redirect('displaycom', book_id=book_id)
-
 def add_to_cart(request, book_id):
     book = Book.objects.get(id=book_id)
 
