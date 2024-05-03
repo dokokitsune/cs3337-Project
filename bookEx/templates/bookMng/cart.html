@@ -13,32 +13,94 @@
     Shopping Cart
 {% endblock title %}
 
-
-
 {% block content %}
-    <h1>Shopping Cart</h1>
-    <table class="cart">
-        <thead>
-            <tr>
-                <th>Product Name</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in cart_items %}
-                <tr>
-                    <td>{{ item.book.name }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>${{ item.book.price }}</td>
-                    <td>
-                        <a href="{% url 'remove_from_cart' item.book.id %}">Remove</a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <p>Total Price: ${{ total_price }}</p>
-{% endblock content %}
+    <div class="container">
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <div class="row">
+                <div class="col-md-9">
+                    <!-- Shopping cart content -->
+                    <div class="ibox">
+                        <div class="ibox-title">
+                            <span class="pull-right">(<strong>{{ cart_items|length }}</strong>) items</span>
+                            <h5>Items in your cart</h5>
+                        </div>
+                        <form method="post" action="{% url 'update_cart' %}">
+                            {% csrf_token %}
+                            {% for item in cart_items %}
+                            <div class="ibox-content">
+                                <div class="table">
+                                    <table class="table shoping_cart_table">
+                                        <tbody>
+                                            <tr>
+                                                <td width="90">
+                                                    <div class="cart-product-imitation">
+                                                    </div>
+                                                </td>
+                                                <td class="desc">
+                                                    <h3>
+                                                        <a href="{% url 'book_detail' item.book.id %}" class="book-name">
+                                                            {{ item.book.name }}
+                                                        </a>
+                                                    </h3>
+                                                    <div class="side-info">
+                                                        <a href="#" class="text-muted"><i class="fa fa-gift"></i> Add gift package</a>
+                                                        |
+                                                        <a href="{% url 'remove_from_cart' item.book.id %}" class="text-muted">
+                                                            <i class="fa fa-trash"></i> Remove item</a>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    ${{ item.book.price }}
+                                                </td>
+                                                <td width="65">
+                                                    <input type="number" name="quantity_{{ item.book.id }}"
+                                                           class="form-control" value="{{ item.quantity }}" min="1">
+                                                </td>
+                                                <td>
+                                                    <h4>
+                                                        ${{ item.total_price }}
+                                                    </h4>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </form>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="ibox">
+                        <div class="ibox-title">
+                            <h5>Cart Summary</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <span>Total</span>
+                            <h2 class="font-bold">${{ total_price }}</h2>
+                            <hr>
+                            <span class="text-muted small">*For United States, France and Germany applicable sales tax will be applied</span>
+                            <div class="m-t-sm">
+                                <div class="btn-group">
+                                    <a href="#" class="btn btn-primary btn-sm"><i class="fa fa-shopping-cart"></i> Checkout</a>
+                                    <a href="#" class="btn btn-white btn-sm">Cancel</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- Support -->
+                    <div class="ibox">
+                        <div class="ibox-title">
+                            <h5>Support</h5>
+                        </div>
+                        <div class="ibox-content text-center">
+                            <h3><i class="fa fa-phone"></i> +43 100 783 001</h3>
+                            <span class="small">Please contact with us if you have any questions. We are available 24h.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
