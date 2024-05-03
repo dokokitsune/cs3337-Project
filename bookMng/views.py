@@ -151,6 +151,7 @@ def add_comment(request, book_id):
                   {
                       'item_list': MainMenu.objects.all(), 'form': form, 'book': book})
 
+
 @login_required(login_url=reverse_lazy('login'))
 def displaycom(request, book_id):
     book = Book.objects.get(id=book_id)
@@ -160,18 +161,19 @@ def displaycom(request, book_id):
                   {
                       'item_list': MainMenu.objects.all(), 'book': book, 'comments': comments})
 
+
 def add_to_cart(request, book_id):
     book = Book.objects.get(id=book_id)
 
     if 'cart' not in request.session:
         request.session['cart'] = {}
 
-    cart = request.session['cart']
+    shopping_cart = request.session['cart']
 
-    if str(book_id) in cart:
-        cart[str(book_id)]['quantity'] += 1
+    if str(book_id) in shopping_cart:
+        shopping_cart[str(book_id)]['quantity'] += 1
     else:
-        cart[str(book_id)] = {
+        shopping_cart[str(book_id)] = {
             'quantity': 1,
             'price': float(book.price)
         }
@@ -181,13 +183,29 @@ def add_to_cart(request, book_id):
     return redirect('cart')
 
 
-
 def remove_from_cart(request, book_id):
     if 'cart' in request.session:
-        cart = request.session['cart']
-        if str(book_id) in cart:
-            del cart[str(book_id)]
+        shopping_cart = request.session['cart']
+        if str(book_id) in shopping_cart:
+            if shopping_cart[str(book_id)]['quantity'] > 1:
+                shopping_cart[str(book_id)]['quantity'] -= 1
+            else:
+                del shopping_cart[str(book_id)]
             request.session.modified = True
+
+    return redirect('cart')
+
+
+def update_cart(request):
+    if request.method == 'POST':
+        shopping_cart = request.session.get('cart', {})
+
+        for book_id, item in shopping_cart.items():
+            quantity = int(request.POST.get(f'quantity_{book_id}', item['quantity']))
+            shopping_cart[book_id]['quantity'] = quantity
+
+        request.session['cart'] = shopping_cart
+        request.session.modified = True
 
     return redirect('cart')
 
@@ -197,19 +215,18 @@ def cart(request):
     total_price = 0
 
     if 'cart' in request.session:
-        cart = request.session['cart']
-        book_ids = cart.keys()
+        shopping_cart = request.session['cart']
+        book_ids = shopping_cart.keys()
         books = Book.objects.filter(id__in=book_ids)
 
         for book in books:
-            quantity = cart[str(book.id)]['quantity']
+            quantity = shopping_cart[str(book.id)]['quantity']
             total_price += book.price * quantity
             cart_items.append({'book': book, 'quantity': quantity})
 
     return render(request, 'bookMng/cart.html',
                   {'cart_items': cart_items, 'total_price': total_price,
                    'item_list': MainMenu.objects.all()})
-
 
 
 def search_book(request):
