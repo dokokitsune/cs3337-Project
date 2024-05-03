@@ -13,6 +13,13 @@ class MainMenu(models.Model):
         return self.item
 
 
+class Genre(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Book(models.Model):
     name = models.CharField(max_length=200)
     web = models.URLField(max_length=300)
@@ -22,6 +29,7 @@ class Book(models.Model):
     pic_path = models.CharField(max_length=300, editable=False, blank=True)
     username = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     favorites = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='favorite_books')
+    genres = models.ManyToManyField(Genre)
 
     def __str__(self):
         return str(self.id)

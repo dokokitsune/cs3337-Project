@@ -44,29 +44,38 @@ def about_us(request):
     )
 
 
+from django.shortcuts import render, HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from .models import MainMenu
+from .forms import BookForm
+from .models import Genre  # Import the Genre model
+
 @login_required(login_url=reverse_lazy("login"))
 def postbook(request):
     submitted = False
     if request.method == "POST":
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
-            # form.save()
             book = form.save(commit=False)
-            try:
-                book.username = request.user
-            except Exception:
-                pass
+            book.username = request.user
             book.save()
+            # Save genres associated with the book
+            form.save_m2m()  # This saves the many-to-many relationships
             return HttpResponseRedirect("/postbook?submitted=True")
     else:
         form = BookForm()
         if "submitted" in request.GET:
             submitted = True
+
+    genres = Genre.objects.all()
+
     return render(
         request,
         "bookMng/postbook.html",
-        {"form": form, "item_list": MainMenu.objects.all(), "submitted": submitted},
+        {"form": form, "item_list": MainMenu.objects.all(), "submitted": submitted, "genres": genres},
     )
+
 
 
 @login_required(login_url=reverse_lazy("login"))
