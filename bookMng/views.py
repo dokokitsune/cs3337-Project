@@ -28,6 +28,7 @@ def favorite(request, book_id):
 
     return redirect('book_detail', book_id=book.id)
 
+
 @login_required
 def my_favorites(request):
     user = request.user
@@ -60,8 +61,7 @@ def postbook(request):
             book = form.save(commit=False)
             book.username = request.user
             book.save()
-            # Save genres associated with the book
-            form.save_m2m()  # This saves the many-to-many relationships
+            form.save_m2m()
             return HttpResponseRedirect("/postbook?submitted=True")
     else:
         form = BookForm()
@@ -210,6 +210,41 @@ def update_cart(request):
     return redirect('cart')
 
 
+def checkout(request):
+    cart_items = []
+    total_price = 0
+
+    if 'cart' in request.session:
+        shopping_cart = request.session['cart']
+        book_ids = shopping_cart.keys()
+        books = Book.objects.filter(id__in=book_ids)
+
+        for book in books:
+            quantity = shopping_cart[str(book.id)]['quantity']
+            total_price += book.price * quantity
+            cart_items.append({'book': book, 'quantity': quantity, 'total_price': book.price * quantity})
+
+    if request.method == 'POST':
+        del request.session['cart']
+        return redirect('order_success')
+
+    context = {
+        'cart_items': cart_items,
+        'total_price': total_price,
+    }
+    return render(request, 'bookMng/checkout.html', context)
+
+
+def order_success(request):
+    return render(request, 'bookMng/order_success.html')
+
+
+def cancel_cart(request):
+    if 'cart' in request.session:
+        del request.session['cart']
+    return redirect('index')
+
+
 def cart(request):
     cart_items = []
     total_price = 0
@@ -226,7 +261,8 @@ def cart(request):
 
     return render(request, 'bookMng/cart.html',
                   {'cart_items': cart_items, 'total_price': total_price,
-                   'item_list': MainMenu.objects.all()})
+                   'item_list': MainMenu.objects.all(),
+                   'is_cart_empty': not cart_items})
 
 
 def search_book(request):
