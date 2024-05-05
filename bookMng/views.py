@@ -14,6 +14,28 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 
 
+
+@login_required
+def favorite(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    user = request.user
+
+    if user in book.favorites.all():
+        # Book is already a favorite, remove it
+        book.favorites.remove(user)
+    else:
+        # Add the book to favorites
+        book.favorites.add(user)
+
+    return redirect('book_detail', book_id=book.id)
+
+
+@login_required
+def my_favorites(request):
+    user = request.user
+    favorite_books = user.favorite_books.all()
+    return render(request, 'bookMng/my_favorites.html', {'favorite_books': favorite_books, 'item_list': MainMenu.objects.all()})
+
 def index(request):
     return render(request, "bookMng/index.html", {"item_list": MainMenu.objects.all()})
 
@@ -37,6 +59,9 @@ def postbook(request):
             except Exception:
                 pass
             book.save()
+
+            form.save_m2m()
+
             return HttpResponseRedirect("/postbook?submitted=True")
     else:
         form = BookForm()
@@ -162,6 +187,54 @@ def remove_from_cart(request, book_id):
 
     return redirect('cart')
 
+def update_cart(request):
+    if request.method == 'POST':
+        shopping_cart = request.session.get('cart', {})
+
+        for book_id, item in shopping_cart.items():
+            quantity = int(request.POST.get(f'quantity_{book_id}', item['quantity']))
+            shopping_cart[book_id]['quantity'] = quantity
+
+        request.session['cart'] = shopping_cart
+        request.session.modified = True
+
+    return redirect('cart')
+
+
+def checkout(request):
+    cart_items = []
+    total_price = 0
+
+    if 'cart' in request.session:
+        shopping_cart = request.session['cart']
+        book_ids = shopping_cart.keys()
+        books = Book.objects.filter(id__in=book_ids)
+
+        for book in books:
+            quantity = shopping_cart[str(book.id)]['quantity']
+            total_price += book.price * quantity
+            cart_items.append({'book': book, 'quantity': quantity, 'total_price': book.price * quantity})
+
+    if request.method == 'POST':
+        del request.session['cart']
+        return redirect('order_success')
+
+    context = {
+        'cart_items': cart_items,
+        'total_price': total_price,
+    }
+    return render(request, 'bookMng/checkout.html', context)
+
+
+def order_success(request):
+    return render(request, 'bookMng/order_success.html')
+
+
+def cancel_cart(request):
+    if 'cart' in request.session:
+        del request.session['cart']
+    return redirect('index')
+
 
 def cart(request):
     cart_items = []
@@ -179,7 +252,8 @@ def cart(request):
 
     return render(request, 'bookMng/cart.html',
                   {'cart_items': cart_items, 'total_price': total_price,
-                   'item_list': MainMenu.objects.all()})
+                   'item_list': MainMenu.objects.all(),
+                   'is_cart_empty': not cart_items})
 
 
 

@@ -55,11 +55,6 @@
                                                     <input type="number" name="quantity_{{ item.book.id }}"
                                                            class="form-control" value="{{ item.quantity }}" min="1">
                                                 </td>
-                                                <td>
-                                                    <h4>
-                                                        ${{ item.total_price }}
-                                                    </h4>
-                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -81,14 +76,19 @@
                             <span class="text-muted small">*For United States, France and Germany applicable sales tax will be applied</span>
                             <div class="m-t-sm">
                                 <div class="btn-group">
-                                    <a href="#" class="btn btn-primary btn-sm"><i class="fa fa-shopping-cart"></i> Checkout</a>
+                                    <a href="{% url 'checkout' %}" class="btn btn-primary btn-sm">
+                                        <i class="fa fa-shopping-cart"></i> Checkout
+                                    </a>
+                                    {% if is_cart_empty %}
                                     <a href="#" class="btn btn-white btn-sm">Cancel</a>
+                                    {% else %}
+                                    <a href="{% url 'cancel_cart' %}" class="btn btn-white btn-sm">Cancel</a>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Support -->
+                    
                     <div class="ibox">
                         <div class="ibox-title">
                             <h5>Support</h5>
