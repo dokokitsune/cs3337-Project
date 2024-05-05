@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 
 # Create your views here.
 from .models import MainMenu, Comment
@@ -14,26 +14,6 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 
 
-@login_required
-def favorite(request, book_id):
-    book = get_object_or_404(Book, id=book_id)
-    user = request.user
-
-    if user in book.favorites.all():
-        # Book is already a favorite, remove it
-        book.favorites.remove(user)
-    else:
-        # Add the book to favorites
-        book.favorites.add(user)
-
-    return redirect('book_detail', book_id=book.id)
-
-@login_required
-def my_favorites(request):
-    user = request.user
-    favorite_books = user.favorite_books.all()
-    return render(request, 'bookMng/my_favorites.html', {'favorite_books': favorite_books, 'item_list': MainMenu.objects.all()})
-
 def index(request):
     return render(request, "bookMng/index.html", {"item_list": MainMenu.objects.all()})
 
@@ -44,38 +24,29 @@ def about_us(request):
     )
 
 
-from django.shortcuts import render, HttpResponseRedirect
-from django.urls import reverse_lazy
-from django.contrib.auth.decorators import login_required
-from .models import MainMenu
-from .forms import BookForm
-from .models import Genre  # Import the Genre model
-
 @login_required(login_url=reverse_lazy("login"))
 def postbook(request):
     submitted = False
     if request.method == "POST":
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
+            # form.save()
             book = form.save(commit=False)
-            book.username = request.user
+            try:
+                book.username = request.user
+            except Exception:
+                pass
             book.save()
-            # Save genres associated with the book
-            form.save_m2m()  # This saves the many-to-many relationships
             return HttpResponseRedirect("/postbook?submitted=True")
     else:
         form = BookForm()
         if "submitted" in request.GET:
             submitted = True
-
-    genres = Genre.objects.all()
-
     return render(
         request,
         "bookMng/postbook.html",
-        {"form": form, "item_list": MainMenu.objects.all(), "submitted": submitted, "genres": genres},
+        {"form": form, "item_list": MainMenu.objects.all(), "submitted": submitted},
     )
-
 
 
 @login_required(login_url=reverse_lazy("login"))
@@ -151,7 +122,6 @@ def add_comment(request, book_id):
                   {
                       'item_list': MainMenu.objects.all(), 'form': form, 'book': book})
 
-
 @login_required(login_url=reverse_lazy('login'))
 def displaycom(request, book_id):
     book = Book.objects.get(id=book_id)
@@ -161,19 +131,18 @@ def displaycom(request, book_id):
                   {
                       'item_list': MainMenu.objects.all(), 'book': book, 'comments': comments})
 
-
 def add_to_cart(request, book_id):
     book = Book.objects.get(id=book_id)
 
     if 'cart' not in request.session:
         request.session['cart'] = {}
 
-    shopping_cart = request.session['cart']
+    cart = request.session['cart']
 
-    if str(book_id) in shopping_cart:
-        shopping_cart[str(book_id)]['quantity'] += 1
+    if str(book_id) in cart:
+        cart[str(book_id)]['quantity'] += 1
     else:
-        shopping_cart[str(book_id)] = {
+        cart[str(book_id)] = {
             'quantity': 1,
             'price': float(book.price)
         }
@@ -183,29 +152,13 @@ def add_to_cart(request, book_id):
     return redirect('cart')
 
 
+
 def remove_from_cart(request, book_id):
     if 'cart' in request.session:
-        shopping_cart = request.session['cart']
-        if str(book_id) in shopping_cart:
-            if shopping_cart[str(book_id)]['quantity'] > 1:
-                shopping_cart[str(book_id)]['quantity'] -= 1
-            else:
-                del shopping_cart[str(book_id)]
+        cart = request.session['cart']
+        if str(book_id) in cart:
+            del cart[str(book_id)]
             request.session.modified = True
-
-    return redirect('cart')
-
-
-def update_cart(request):
-    if request.method == 'POST':
-        shopping_cart = request.session.get('cart', {})
-
-        for book_id, item in shopping_cart.items():
-            quantity = int(request.POST.get(f'quantity_{book_id}', item['quantity']))
-            shopping_cart[book_id]['quantity'] = quantity
-
-        request.session['cart'] = shopping_cart
-        request.session.modified = True
 
     return redirect('cart')
 
@@ -215,18 +168,19 @@ def cart(request):
     total_price = 0
 
     if 'cart' in request.session:
-        shopping_cart = request.session['cart']
-        book_ids = shopping_cart.keys()
+        cart = request.session['cart']
+        book_ids = cart.keys()
         books = Book.objects.filter(id__in=book_ids)
 
         for book in books:
-            quantity = shopping_cart[str(book.id)]['quantity']
+            quantity = cart[str(book.id)]['quantity']
             total_price += book.price * quantity
             cart_items.append({'book': book, 'quantity': quantity})
 
     return render(request, 'bookMng/cart.html',
                   {'cart_items': cart_items, 'total_price': total_price,
                    'item_list': MainMenu.objects.all()})
+
 
 
 def search_book(request):
