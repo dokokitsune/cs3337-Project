@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{%  load static %}
+
+{% block content %}
+
+    <h2>Posted Book Successfully</h2>
+    <p>You will be redirected home shortly...</p>
+
+    <script>
+        setTimeout(function () {
+            window.location.href = "{% url 'index' %}"
+        }, 3000)
+    </script>
+
+
+{% endblock %}

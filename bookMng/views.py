@@ -1,3 +1,5 @@
+import time
+
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
@@ -12,6 +14,13 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 
 from django.contrib.auth.decorators import login_required
+
+from django.shortcuts import render, HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from .models import MainMenu
+from .forms import BookForm
+from .models import Genre  # Import the Genre model
 
 
 
@@ -34,16 +43,22 @@ def favorite(request, book_id):
 def my_favorites(request):
     user = request.user
     favorite_books = user.favorite_books.all()
-    return render(request, 'bookMng/my_favorites.html', {'favorite_books': favorite_books, 'item_list': MainMenu.objects.all()})
+    return render(request, 'bookMng/my_favorites.html',
+                  {'favorite_books': favorite_books, 'item_list': MainMenu.objects.all()})
+
 
 def index(request):
-    return render(request, "bookMng/index.html", {"item_list": MainMenu.objects.all()})
+    books = Book.objects.all()
+    for b in books:
+        b.pic_path = b.picture.url[14:]
+    return render(request, "bookMng/index.html", {"item_list": MainMenu.objects.all(), "books": books}, )
 
 
 def about_us(request):
     return render(
         request, "bookMng/about_us.html", {"item_list": MainMenu.objects.all()}
     )
+
 
 
 @login_required(login_url=reverse_lazy("login"))
@@ -66,12 +81,23 @@ def postbook(request):
     else:
         form = BookForm()
         if "submitted" in request.GET:
-            submitted = True
+            return redirect(reverse_lazy("post_success"))
+
+    genres = Genre.objects.all()
+
+
     return render(
         request,
         "bookMng/postbook.html",
         {"form": form, "item_list": MainMenu.objects.all(), "submitted": submitted},
     )
+
+
+
+@login_required(login_url=reverse_lazy("login"))
+def post_success(request):
+    return render(request, "bookMng/post_success.html")
+
 
 
 @login_required(login_url=reverse_lazy("login"))
@@ -206,12 +232,12 @@ def checkout(request):
     total_price = 0
 
     if 'cart' in request.session:
-        shopping_cart = request.session['cart']
-        book_ids = shopping_cart.keys()
+        cart = request.session['cart']
+        book_ids = cart.keys()
         books = Book.objects.filter(id__in=book_ids)
 
         for book in books:
-            quantity = shopping_cart[str(book.id)]['quantity']
+            quantity = cart[str(book.id)]['quantity']
             total_price += book.price * quantity
             cart_items.append({'book': book, 'quantity': quantity, 'total_price': book.price * quantity})
 
