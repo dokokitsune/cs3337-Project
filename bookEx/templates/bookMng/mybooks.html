@@ -10,8 +10,8 @@
 {% endblock sidenav %}
 
 {% block content %}
-<h1 align="center">My Books</h1>
-<table border="2" width="600">
+<h1 style="margin-bottom:50px; font-family: Georgia;" align="center">My Books</h1>
+<table border="10" width="600" align="center" cellpadding="20px">
     <tr>
         <th>
             Name
@@ -29,7 +29,7 @@
     {% for book in books %}
      <tr>
          <td>
-             <a href="book_detail/{{ book.id }}">
+             <a href="book_detail/{{ book.id }}" style="text-decoration:none">
                 {{ book.name }}
              </a>
          </td>
@@ -43,7 +43,7 @@
              <img src="{% static book.pic_path %}" height="50"/>
          </td>
          <td>
-             <a href="book_delete/{{ book.id }}">
+             <a href="book_delete/{{ book.id }}" class="btn btn-danger btn-sm">
                 Delete
              </a>
          </td>
