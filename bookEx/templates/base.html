@@ -10,39 +10,47 @@
 		{% endblock title %}
 	</title>
 	<link rel="icon" type="image/x-icon" href="{% static 'logo.jpg' %}">
-	<link href="{% static 'main.css' %}" rel="stylesheet" type="text/css">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
 	      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
 	        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
 	        crossorigin="anonymous"></script>
+	<link href="{% static "main.css" %}" rel="stylesheet" type="text/css">
+    {% block child-css %}{% endblock %}
 </head>
 
 <body>
 <div id="navbar">
 
-	{% if user.is_authenticated %}
-		<nav id="navbar" class="navbar navbar-expand-lg bg-body-tertiary ">
+
+		<nav id="navbar" class="navbar navbar-expand-lg bg-dark-subtle ">
 			<div class="container-fluid">
 				<a class="navbar-brand" href="{% url 'index' %}">
 					<img src="{% static 'logo.jpg' %}" alt="Book Exchange" height="50" width="50"
 					     class="d-line-block ">
 					Book Exchange
 				</a>
-				<form action="{% url 'search_book' %}" method="post" class="d-flex" role="search">
-					<input name="search-item" class="form-control me-2" type="search" placeholder="Library Awaits..." aria-label="Search">
+				<form action="{% url 'search_book' %}" method="post" class="d-flex input-group w-50" role="search">
+					<input name="search-item" class="form-control mx-3" type="search" placeholder="Our Library Awaits..." aria-label="Search">
 					<button class="btn btn-outline-success" type="submit">Search</button>
                     {% csrf_token %}
 				</form>
 
-				<ul class="navbar-nav">
-					<li class=" nav-item dropdown">
+				<ul class="navbar-nav ">
+                <li class="nav-item">
+						<button class="btn btn-primary" ><a style="text-decoration: none; color: white" href="{% url 'about_us' %}">About Us</a></button>
+
+					</li>
+{#                if user is authenticated#}
+                    {% if user.is_authenticated %}
+
+					<li class=" nav-item dropdown ms-3">
 
 						<button class="btn btn-secondary dropdown-toggle" type="button"
 						        data-bs-toggle="dropdown">Account
 						</button>
 						<ul class="dropdown-menu">
-							<li align="center">{{ user.username }}</li>
+							<li class="d-flex justify-content-center border-bottom border-dark">Hello, {{ user.username }}</li>
 							<li class="dropdown-item"><a href="{% url 'mybooks' %}?next=/">My Books</a></li>
 							<li class="dropdown-item"><a href="{% url 'postbook' %}?next=/">Post Book</a></li>
 							<li class="dropdown-item"><a href="{% url 'displaybooks' %}?next=/">Display Books</a></li>
@@ -52,38 +60,16 @@
 
 
 					</li>
-					<li class = "nav-item" >
+					<li class = "nav-item ms-3" >
 						<form action="{% url 'logout' %}?next=/" method="post">
-							<button class="btn btn-outline-danger" href="{% url 'logout' %}?next=/" type="submit">logout</button>
+							<button class="btn btn-outline-danger" href="{% url 'logout' %}?next=/" type="submit">Logout</button>
 							{% csrf_token %}
 						</form>
 					</li>
-					<li class="nav-item">
-						<a class="nav-link" aria-current="page" href="{% url 'about_us' %}">About Us</a>
+{#                        if no user logged in#}
 
-					</li>
-				</ul>
-
-
-			</div>
-		</nav>
-<!--		{{ user.username }}-->
-	{% else %}
-		<nav id="navbar" class="navbar navbar-expand-lg bg-body-tertiary ">
-			<div class="container-fluid">
-				<a class="navbar-brand" href="{% url 'index' %}">
-					<img src="{% static 'logo.jpg' %}" alt="Book Exchange" height="50" width="50"
-					     class="d-line-block ">
-					Book Exchange
-				</a>
-				<form action="{% url 'search_book' %}" method="post" class="d-flex" role="search">
-					<input name="search-item" class="form-control me-2" type="search" placeholder="Library Awaits..." aria-label="Search">
-					<button class="btn btn-outline-success" type="submit">Search</button>
-                    {% csrf_token %}
-				</form>
-
-				<ul class="navbar-nav">
-					<li class=" nav-item dropdown">
+                    {% else %}
+					<li class=" nav-item dropdown ms-3">
 
 						<button class="btn btn-secondary dropdown-toggle" type="button"
 						        data-bs-toggle="dropdown">Account
@@ -94,32 +80,29 @@
 
 
 					</li>
-					<li class="nav-item">
-						<a class="nav-link" aria-current="page" href="{% url 'about_us' %}">About Us</a>
+                    	{% endif %}
 
-					</li>
 				</ul>
 
 
 			</div>
 		</nav>
 
-	{% endif %}
 
 
 
 	<div class="d-flex justify-content-center flex-column align-items-center">
 		<img src="{% static 'banner2.0.png' %}" alt="BANNER"
 		     width="1480" height="300"/>
-		<section id="main">
-			{% block content %}
-				<h1 class="text-center ">This is our Book Exchange System</h1>
-			{% endblock content %}
-		</section>
+{#    Content#}
+        {% block content %}
+
+    {% endblock %}
+
 	</div>
 
 
-	<footer style="margin-top:110px" align="center" id="footer">
+	<footer   id="footer" class="text-align-center d-flex justify-content-center border-top border-dark">
 		2024 Spring CS3337 Section 1 Project
 	</footer>
 </div>
