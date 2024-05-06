@@ -33,6 +33,18 @@ def favorite(request, book_id):
 
 
 @login_required
+def remove_favorite(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    user = request.user
+
+    if user in book.favorites.all():
+        # Book is already a favorite, remove it
+        book.favorites.remove(user)
+
+    return redirect('my_favorites')
+
+
+@login_required
 def my_favorites(request):
     user = request.user
     favorite_books = user.favorite_books.all()
@@ -209,6 +221,13 @@ def displaycom(request, book_id):
                   'bookMng/displaycom.html',
                   {
                       'item_list': MainMenu.objects.all(), 'book': book, 'comments': comments})
+
+
+@login_required(login_url=reverse_lazy('login'))
+def delete_comment(request, book_id, comment_id):
+    comments = Comment.objects.get(id=comment_id, book__id=book_id)
+    comments.delete()
+    return redirect('displaycom', book_id=book_id)
 
 
 def add_to_cart(request, book_id):
