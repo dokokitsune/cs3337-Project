@@ -9,6 +9,7 @@ urlpatterns = [
     path("book_detail/<int:book_id>", views.book_detail, name="book_detail"),
     path("book_delete/<int:book_id>", views.book_delete, name="book_delete"),
     path("postbook", views.postbook, name="postbook"),
+    path("post_success", views.post_success, name="post_success"),
     path("displaybooks", views.displaybooks, name="displaybooks"),
     path("mybooks", views.mybooks, name="mybooks"),
     path('add_comment/<int:book_id>/', views.add_comment, name='add_comment'),

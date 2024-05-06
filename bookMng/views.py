@@ -1,17 +1,19 @@
+import time
+import random
+import datetime
+
 from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
 
 # Create your views here.
-from .models import MainMenu, Comment
-from .forms import BookForm, CommentForm
-from .models import Book
 
 from django.views.generic.edit import CreateView
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
-
 from django.contrib.auth.decorators import login_required
+from .models import MainMenu, Comment
+from .forms import BookForm, CommentForm
+from .models import Genre, Book
 
 
 
@@ -34,16 +36,56 @@ def favorite(request, book_id):
 def my_favorites(request):
     user = request.user
     favorite_books = user.favorite_books.all()
-    return render(request, 'bookMng/my_favorites.html', {'favorite_books': favorite_books, 'item_list': MainMenu.objects.all()})
+    return render(request, 'bookMng/my_favorites.html',
+                  {'favorite_books': favorite_books, 'item_list': MainMenu.objects.all()})
+
 
 def index(request):
-    return render(request, "bookMng/index.html", {"item_list": MainMenu.objects.all()})
+    today = datetime.date.today()
+
+    if 'random_genre_date' not in request.session or request.session['random_genre_date'] != str(today):
+        genres = Genre.objects.all()
+        random_genre = random.choice(genres)
+        request.session['random_genre'] = random_genre.id
+        request.session['random_genre_date'] = str(today)
+
+    random_genre_id = request.session.get('random_genre')
+    random_genre = Genre.objects.get(id=random_genre_id) if random_genre_id else None
+
+    if random_genre:
+        books = Book.objects.filter(genres=random_genre)
+    else:
+        books = Book.objects.none()
+
+    for b in books:
+        b.pic_path = b.picture.url[14:]
+
+    next_refresh_time = datetime.datetime.combine(today + datetime.timedelta(days=1), datetime.time.min)
+    time_until_refresh = next_refresh_time - datetime.datetime.now()
+
+    hours_remaining = time_until_refresh.seconds // 3600
+    minutes_remaining = (time_until_refresh.seconds % 3600) // 60
+    seconds_remaining = time_until_refresh.seconds % 60
+
+    if hours_remaining > 0:
+        time_til_refresh = f"in {hours_remaining} hour{'s' if hours_remaining > 1 else ''} and {minutes_remaining} minute{'s' if minutes_remaining > 1 else ''}"
+    elif minutes_remaining > 0:
+        time_til_refresh = f"in {minutes_remaining} minute{'s' if minutes_remaining > 1 else ''}"
+    else:
+        time_til_refresh = f"in {seconds_remaining} second{'s' if seconds_remaining > 1 else ''}"
+
+    return render(request, "bookMng/index.html",
+                  {"item_list": MainMenu.objects.all(), "books": books,
+                   "random_genre": random_genre,
+                   "time_til_refresh": time_til_refresh,
+                   }, )
 
 
 def about_us(request):
     return render(
         request, "bookMng/about_us.html", {"item_list": MainMenu.objects.all()}
     )
+
 
 
 @login_required(login_url=reverse_lazy("login"))
@@ -66,12 +108,23 @@ def postbook(request):
     else:
         form = BookForm()
         if "submitted" in request.GET:
-            submitted = True
+            return redirect(reverse_lazy("post_success"))
+
+    genres = Genre.objects.all()
+
+
     return render(
         request,
         "bookMng/postbook.html",
         {"form": form, "item_list": MainMenu.objects.all(), "submitted": submitted},
     )
+
+
+
+@login_required(login_url=reverse_lazy("login"))
+def post_success(request):
+    return render(request, "bookMng/post_success.html")
+
 
 
 @login_required(login_url=reverse_lazy("login"))
@@ -147,6 +200,7 @@ def add_comment(request, book_id):
                   {
                       'item_list': MainMenu.objects.all(), 'form': form, 'book': book})
 
+
 @login_required(login_url=reverse_lazy('login'))
 def displaycom(request, book_id):
     book = Book.objects.get(id=book_id)
@@ -155,6 +209,7 @@ def displaycom(request, book_id):
                   'bookMng/displaycom.html',
                   {
                       'item_list': MainMenu.objects.all(), 'book': book, 'comments': comments})
+
 
 def add_to_cart(request, book_id):
     book = Book.objects.get(id=book_id)
@@ -177,7 +232,6 @@ def add_to_cart(request, book_id):
     return redirect('cart')
 
 
-
 def remove_from_cart(request, book_id):
     if 'cart' in request.session:
         cart = request.session['cart']
@@ -186,6 +240,7 @@ def remove_from_cart(request, book_id):
             request.session.modified = True
 
     return redirect('cart')
+
 
 def update_cart(request):
     if request.method == 'POST':
@@ -206,12 +261,12 @@ def checkout(request):
     total_price = 0
 
     if 'cart' in request.session:
-        shopping_cart = request.session['cart']
-        book_ids = shopping_cart.keys()
+        cart = request.session['cart']
+        book_ids = cart.keys()
         books = Book.objects.filter(id__in=book_ids)
 
         for book in books:
-            quantity = shopping_cart[str(book.id)]['quantity']
+            quantity = cart[str(book.id)]['quantity']
             total_price += book.price * quantity
             cart_items.append({'book': book, 'quantity': quantity, 'total_price': book.price * quantity})
 
@@ -254,7 +309,6 @@ def cart(request):
                   {'cart_items': cart_items, 'total_price': total_price,
                    'item_list': MainMenu.objects.all(),
                    'is_cart_empty': not cart_items})
-
 
 
 def search_book(request):
