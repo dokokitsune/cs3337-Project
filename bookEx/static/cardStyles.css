@@ -1,0 +1,14 @@
+.card{
+       transition: all 0.3s;
+
+    width: 18rem !important;
+
+
+}
+
+.card:hover{
+       transition: all 0.3s;
+    overflow: hidden;
+    transform: scale(1.1);
+
+}

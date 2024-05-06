@@ -48,6 +48,10 @@
                 {% csrf_token %}
                 <input type="submit" name="add_to_cart" value="Add to Cart">
             </form>
+             <form method="post" action="{% url 'remove_favorite' book.id %}">
+                {% csrf_token %}
+                <input type="submit" name="remove_favorite" value="Remove from Favorites">
+             </form>
          </td>
      </tr>
    {% endfor %}

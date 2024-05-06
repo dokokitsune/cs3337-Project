@@ -11,11 +11,7 @@
 
 {% block content %}
 <h1 align="center">This is Post Book Page</h1>
-{% if submitted %}
-   <p>
-       Post Book Successfully!
-   </p>
-{% else %}
+
 <form action="" enctype="multipart/form-data" method="post" novalidate>
     {% csrf_token %}
     <table>
@@ -27,5 +23,4 @@
         </tr>
     </table>
 </form>
-{% endif %}
 {% endblock content %}
