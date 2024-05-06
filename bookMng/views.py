@@ -29,6 +29,7 @@ def favorite(request, book_id):
         # Add the book to favorites
         book.favorites.add(user)
 
+
     return redirect('book_detail', book_id=book.id)
 
 
@@ -48,6 +49,8 @@ def remove_favorite(request, book_id):
 def my_favorites(request):
     user = request.user
     favorite_books = user.favorite_books.all()
+    for b in favorite_books:
+        b.pic_path = b.picture.url[14:]
     return render(request, 'bookMng/my_favorites.html',
                   {'favorite_books': favorite_books, 'item_list': MainMenu.objects.all()})
 
