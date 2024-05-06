@@ -1,26 +1,19 @@
 import time
+import random
+import datetime
 
 from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
 
 # Create your views here.
-from .models import MainMenu, Comment
-from .forms import BookForm, CommentForm
-from .models import Book
 
 from django.views.generic.edit import CreateView
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
-
 from django.contrib.auth.decorators import login_required
-
-from django.shortcuts import render, HttpResponseRedirect
-from django.urls import reverse_lazy
-from django.contrib.auth.decorators import login_required
-from .models import MainMenu
-from .forms import BookForm
-from .models import Genre  # Import the Genre model
+from .models import MainMenu, Comment
+from .forms import BookForm, CommentForm
+from .models import Genre, Book
 
 
 
@@ -38,6 +31,7 @@ def favorite(request, book_id):
 
     return redirect('book_detail', book_id=book.id)
 
+
 @login_required
 def remove_favorite(request, book_id):
     book = get_object_or_404(Book, id=book_id)
@@ -49,6 +43,7 @@ def remove_favorite(request, book_id):
 
     return redirect('my_favorites')
 
+
 @login_required
 def my_favorites(request):
     user = request.user
@@ -58,10 +53,44 @@ def my_favorites(request):
 
 
 def index(request):
-    books = Book.objects.all()
+    today = datetime.date.today()
+
+    if 'random_genre_date' not in request.session or request.session['random_genre_date'] != str(today):
+        genres = Genre.objects.all()
+        random_genre = random.choice(genres)
+        request.session['random_genre'] = random_genre.id
+        request.session['random_genre_date'] = str(today)
+
+    random_genre_id = request.session.get('random_genre')
+    random_genre = Genre.objects.get(id=random_genre_id) if random_genre_id else None
+
+    if random_genre:
+        books = Book.objects.filter(genres=random_genre)
+    else:
+        books = Book.objects.none()
+
     for b in books:
         b.pic_path = b.picture.url[14:]
-    return render(request, "bookMng/index.html", {"item_list": MainMenu.objects.all(), "books": books}, )
+
+    next_refresh_time = datetime.datetime.combine(today + datetime.timedelta(days=1), datetime.time.min)
+    time_until_refresh = next_refresh_time - datetime.datetime.now()
+
+    hours_remaining = time_until_refresh.seconds // 3600
+    minutes_remaining = (time_until_refresh.seconds % 3600) // 60
+    seconds_remaining = time_until_refresh.seconds % 60
+
+    if hours_remaining > 0:
+        time_til_refresh = f"in {hours_remaining} hour{'s' if hours_remaining > 1 else ''} and {minutes_remaining} minute{'s' if minutes_remaining > 1 else ''}"
+    elif minutes_remaining > 0:
+        time_til_refresh = f"in {minutes_remaining} minute{'s' if minutes_remaining > 1 else ''}"
+    else:
+        time_til_refresh = f"in {seconds_remaining} second{'s' if seconds_remaining > 1 else ''}"
+
+    return render(request, "bookMng/index.html",
+                  {"item_list": MainMenu.objects.all(), "books": books,
+                   "random_genre": random_genre,
+                   "time_til_refresh": time_til_refresh,
+                   }, )
 
 
 def about_us(request):
@@ -183,6 +212,7 @@ def add_comment(request, book_id):
                   {
                       'item_list': MainMenu.objects.all(), 'form': form, 'book': book})
 
+
 @login_required(login_url=reverse_lazy('login'))
 def displaycom(request, book_id):
     book = Book.objects.get(id=book_id)
@@ -192,11 +222,13 @@ def displaycom(request, book_id):
                   {
                       'item_list': MainMenu.objects.all(), 'book': book, 'comments': comments})
 
+
 @login_required(login_url=reverse_lazy('login'))
 def delete_comment(request, book_id, comment_id):
     comments = Comment.objects.get(id=comment_id, book__id=book_id)
     comments.delete()
     return redirect('displaycom', book_id=book_id)
+
 
 def add_to_cart(request, book_id):
     book = Book.objects.get(id=book_id)
@@ -219,7 +251,6 @@ def add_to_cart(request, book_id):
     return redirect('cart')
 
 
-
 def remove_from_cart(request, book_id):
     if 'cart' in request.session:
         cart = request.session['cart']
@@ -228,6 +259,7 @@ def remove_from_cart(request, book_id):
             request.session.modified = True
 
     return redirect('cart')
+
 
 def update_cart(request):
     if request.method == 'POST':
@@ -296,7 +328,6 @@ def cart(request):
                   {'cart_items': cart_items, 'total_price': total_price,
                    'item_list': MainMenu.objects.all(),
                    'is_cart_empty': not cart_items})
-
 
 
 def search_book(request):
