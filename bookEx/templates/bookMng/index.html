@@ -7,11 +7,19 @@
 
 {% block content %}
      	<section id="main">
-			<h1 class="text-center ">This is our Book Exchange System</h1>
+
+			{% if random_genre %}
+                <h1 class="text-center">Genre of the day: {{ random_genre.name }}</h1>
+            {% else %}
+             <h1 class="text-center">No books available</h1>
+            {% endif %}
+            <div class="text-center">
+            <p>Genre selection refreshes {{ time_til_refresh }}</p>
+            </div>
 
             <div class="d-flex flex-wrap cardContainer ">
                 {% for book in books %}
-                    
+
                     <a href="book_detail/{{ book.id }}" class="m-4">
 
                     <div class="card" >
@@ -33,4 +41,3 @@
 		</section>
 
 {% endblock %}
-
