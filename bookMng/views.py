@@ -38,6 +38,16 @@ def favorite(request, book_id):
 
     return redirect('book_detail', book_id=book.id)
 
+@login_required
+def remove_favorite(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    user = request.user
+
+    if user in book.favorites.all():
+        # Book is already a favorite, remove it
+        book.favorites.remove(user)
+
+    return redirect('my_favorites')
 
 @login_required
 def my_favorites(request):
