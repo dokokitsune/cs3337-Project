@@ -16,7 +16,6 @@ from .forms import BookForm, CommentForm
 from .models import Genre, Book
 
 
-
 @login_required
 def favorite(request, book_id):
     book = get_object_or_404(Book, id=book_id)
@@ -28,7 +27,6 @@ def favorite(request, book_id):
     else:
         # Add the book to favorites
         book.favorites.add(user)
-
 
     return redirect('book_detail', book_id=book.id)
 
@@ -102,7 +100,6 @@ def about_us(request):
     )
 
 
-
 @login_required(login_url=reverse_lazy("login"))
 def postbook(request):
     submitted = False
@@ -127,7 +124,6 @@ def postbook(request):
 
     genres = Genre.objects.all()
 
-
     return render(
         request,
         "bookMng/postbook.html",
@@ -135,11 +131,9 @@ def postbook(request):
     )
 
 
-
 @login_required(login_url=reverse_lazy("login"))
 def post_success(request):
     return render(request, "bookMng/post_success.html")
-
 
 
 @login_required(login_url=reverse_lazy("login"))
@@ -351,3 +345,5 @@ def search_book(request):
                           'item_list': MainMenu.objects.all(),
                           'books': books
                       })
+
+

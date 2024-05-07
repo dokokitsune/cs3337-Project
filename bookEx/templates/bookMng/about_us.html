@@ -2,8 +2,21 @@
 {% load static %}
 
 {% block content %}
-    <h1 class="d-flex justify-content-center pb-5">About Us</h1>
-<p class="text-align-center d-flex justify-content-center">(About Us Text Go Here)</p>
+    <section id="main">
+        <div class="container d-flex">
+            <img class="p-5" src="{% static 'about_us/about-us.jpg' %}" height="400px" width="600px" alt="ABOUT_US_IMG">
+            <div class="p-5">
+                <h1>About Book Exchange</h1>
+                <p class="pt-3">Our mission at Book Exchange is promote and maintain our thriving Book Exchange community
+                At Book exchange, we provide a platform where users can post, buy, and sell their favorite books. We started
+                this website with one dream in mind, "Provide a simple and free website to all". We will never sell your data,
+                encourage or allow users of third party platforms to list books, and we always value your input on our listings
+                and on us! </p>
+            </div>
+
+        </div>
+    </section>
+
 
 {% endblock %}
 

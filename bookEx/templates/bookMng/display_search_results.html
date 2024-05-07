@@ -1,38 +1,35 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block sidenav %}
-    {% for item in item_list %}
-     <li>
-         <a href="{{ item.link }}"> {{ item.item }} </a>
-     </li>
-    {% endfor %}
-{% endblock sidenav %}
+{% block child-css %}
+    <link href="{% static 'cardStyles.css'   %}" rel="stylesheet" type="text/css">
+
+{% endblock %}
+
+
 
 {% block content %}
+    <section id="main">
     <h1 style="text-align: center">Search Results</h1>
     {% if books %}
-        <table border="2" width="600">
-        <tr>
-            <th>
-                Name
-            </th>
-            <th>
-                Picture
-            </th>
-        </tr>
-        {% for book in books %}
-        <tr>
-            <td>
-             <a href="book_detail/{{ book.id }}">
-                {{ book.name }}
-             </a>
-         </td>
-         <td>
-             <img src="{% static book.pic_path %}" height="50"/>
-         </td>
-        </tr>
-        {% endfor %}
+         <div class="d-flex flex-wrap cardContainer ">
+                {% for book in books %}
+
+                    <a href="book_detail/{{ book.id }}" class="m-4">
+
+                    <div class="card" >
+
+                        <img class="card-img-top mx-auto" style="width: 200px; height: 200px; object-fit: scale-down;" src="{% static book.pic_path %}" alt="Book Entry"/>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ book.name }}</h5>
+
+                        </div>
+                    </div>
+                    </a>
+
+                {% endfor %}
+
+            </div>
     {% else %}
         <p>
             <b>Search Result Not Found</b>
@@ -40,7 +37,8 @@
             Please try again
         </p>
     {% endif %}
+    </section>
 
-</table>
+
     
 {% endblock %}
